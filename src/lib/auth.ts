@@ -80,9 +80,21 @@ export const authOptions: NextAuthOptions = {
       }
       return session;
     },
+
+    async redirect({ url, baseUrl }) {
+      // Dynamically handle Vercel deployment URLs vs local localhost
+      const host = process.env.VERCEL_URL
+        ? `https://${process.env.VERCEL_URL}`
+        : process.env.NEXTAUTH_URL || baseUrl;
+      
+      if (url.startsWith('/')) return `${host}${url}`;
+      if (new URL(url).origin === new URL(host).origin) return url;
+      return host;
+    },
   },
   pages: {
     signIn: '/',
   },
   secret: process.env.NEXTAUTH_SECRET || 'haven_restaurant_lounge_secret_key_2026',
 };
+
