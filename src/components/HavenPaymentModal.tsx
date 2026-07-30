@@ -233,7 +233,7 @@ export function HavenPaymentModal({
   };
 
   // Handle UPI / Wallet submission (no card validation needed)
-  const handleWalletSubmit = () => {
+  const handleWalletSubmit = React.useCallback(() => {
     setIsSubmitting(true);
     const ref = `TXN-${Math.floor(100000 + Math.random() * 900000)}`;
     setTransactionRef(ref);
@@ -253,7 +253,28 @@ export function HavenPaymentModal({
         'order'
       );
     }, 2200);
-  };
+  }, [amount, cart, createOrder, currentUser, addNotification, selectedMethod]);
+
+  // Demo auto-pay feature for UPI / QR Code screen & auto-close on success
+  useEffect(() => {
+    let autoPayTimer: NodeJS.Timeout;
+    if (isOpen && selectedMethod === 'upi' && currentScreen === 'details' && !isSuccess && !isSubmitting) {
+      autoPayTimer = setTimeout(() => {
+        handleWalletSubmit();
+      }, 7000); // Auto simulate payment completion after 7s on QR screen
+    }
+    return () => clearTimeout(autoPayTimer);
+  }, [isOpen, selectedMethod, currentScreen, isSuccess, isSubmitting, handleWalletSubmit]);
+
+  useEffect(() => {
+    let closeTimer: NodeJS.Timeout;
+    if (isOpen && isSuccess) {
+      closeTimer = setTimeout(() => {
+        onClose();
+      }, 4000); // Auto close modal 4s after payment success screen is shown
+    }
+    return () => clearTimeout(closeTimer);
+  }, [isOpen, isSuccess, onClose]);
 
   const renderCardNumber = () => {
     if (!cardNumber) return '4532  8910  2345  6789';

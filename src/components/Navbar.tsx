@@ -101,9 +101,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenPayment }) => 
 
             <button
               onClick={() => setIsAuthOpen(true)}
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-full border border-haven-gold/40 bg-haven-card hover:border-haven-gold text-haven-text-primary text-xs font-sans uppercase tracking-wider transition shadow-gold-sm"
+              className={`hidden sm:flex items-center gap-2 px-4 py-2 rounded-full border text-xs font-sans uppercase tracking-wider transition shadow-gold-sm ${
+                currentUser
+                  ? 'border-haven-gold bg-haven-gold/10 text-haven-gold hover:bg-haven-gold hover:text-black'
+                  : 'border-haven-gold/40 bg-haven-card hover:border-haven-gold text-haven-text-primary'
+              }`}
             >
-              <UserIcon className="w-4 h-4 text-haven-gold" />
+              <UserIcon className={`w-4 h-4 ${currentUser ? 'text-haven-gold' : 'text-haven-gold'}`} />
               <span className="truncate max-w-[100px]">
                 {currentUser ? currentUser.name : 'Sign In'}
               </span>
@@ -168,9 +172,13 @@ export const Navbar: React.FC<NavbarProps> = ({ onOpenCart, onOpenPayment }) => 
                 setIsMobileMenuOpen(false);
                 setIsAuthOpen(true);
               }}
-              className="w-full py-2.5 rounded-full border border-haven-gold text-haven-gold text-xs uppercase tracking-widest font-semibold text-center"
+              className={`w-full py-2.5 rounded-full border text-xs uppercase tracking-widest font-semibold text-center transition ${
+                currentUser
+                  ? 'border-haven-gold bg-haven-gold/10 text-haven-gold hover:bg-haven-gold hover:text-black'
+                  : 'border-haven-gold text-haven-gold'
+              }`}
             >
-              {currentUser ? `Account (${currentUser.name})` : 'Sign In'}
+              {currentUser ? `Hi, ${currentUser.name}` : 'Sign In'}
             </button>
           </div>
         )}

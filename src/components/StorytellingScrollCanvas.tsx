@@ -53,14 +53,14 @@ function CanvasStoryStepItem({
 
   const opacity = useTransform(
     scrollYProgress,
-    [start, mid - 0.05, mid + 0.05, end],
-    [0, 1, 1, 0]
+    idx === 0 ? [0, 0.18, 0.25] : [start, mid - 0.05, mid + 0.05, end],
+    idx === 0 ? [1, 1, 0] : [0, 1, 1, 0]
   );
 
   const y = useTransform(
     scrollYProgress,
-    [start, mid - 0.05, mid + 0.05, end],
-    [30, 0, 0, -30]
+    idx === 0 ? [0, 0, -30] : [start, mid - 0.05, mid + 0.05, end],
+    idx === 0 ? [0, 0, -30] : [30, 0, 0, -30]
   );
 
   return (

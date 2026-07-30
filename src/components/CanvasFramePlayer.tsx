@@ -40,35 +40,41 @@ export const CanvasFramePlayer: React.FC<CanvasFramePlayerProps> = ({
     [folderPath]
   );
 
-  // Preload frames
+  // Preload frames with instant fallback for localhost stability
   useEffect(() => {
     let isMounted = true;
     const loadedImages: HTMLImageElement[] = [];
     let loadedCount = 0;
 
+    // Fail-safe timeout: Ensure page is marked loaded within 1 second max
+    const fallbackTimeout = setTimeout(() => {
+      if (isMounted) {
+        setIsLoaded(true);
+      }
+    }, 1000);
+
+    const checkLoaded = () => {
+      if (!isMounted) return;
+      loadedCount++;
+      setLoadProgress(Math.round((loadedCount / frameCount) * 100));
+      if (loadedCount >= frameCount || loadedCount >= 15) {
+        setIsLoaded(true);
+      }
+    };
+
     // Load every frame progressively
     for (let i = 0; i < frameCount; i++) {
       const img = new Image();
       img.src = getFrameFilename(i);
-      img.onload = () => {
-        if (!isMounted) return;
-        loadedCount++;
-        setLoadProgress(Math.round((loadedCount / frameCount) * 100));
-        if (loadedCount === frameCount || loadedCount >= 40) {
-          // Allow render once first 40 frames are loaded
-          setIsLoaded(true);
-        }
-      };
-      img.onerror = () => {
-        if (!isMounted) return;
-        loadedCount++;
-      };
+      img.onload = checkLoaded;
+      img.onerror = checkLoaded;
       loadedImages.push(img);
     }
     setImages(loadedImages);
 
     return () => {
       isMounted = false;
+      clearTimeout(fallbackTimeout);
     };
   }, [getFrameFilename, frameCount]);
 

@@ -2,6 +2,9 @@ import './globals.css';
 import type { Metadata } from 'next';
 import { Cormorant_Garamond, Inter } from 'next/font/google';
 import { StoreProvider } from '@/lib/store';
+import AuthProvider from '@/components/AuthProvider';
+import SessionSync from '@/components/SessionSync';
+import CartToast from '@/components/CartToast';
 
 const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
@@ -30,9 +33,13 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${cormorant.variable} ${inter.variable} scroll-smooth`}>
       <body className="bg-haven-bg text-haven-text-primary antialiased selection:bg-haven-gold selection:text-black">
-        <StoreProvider>
-          {children}
-        </StoreProvider>
+        <AuthProvider>
+          <StoreProvider>
+            <SessionSync />
+            <CartToast />
+            {children}
+          </StoreProvider>
+        </AuthProvider>
       </body>
     </html>
   );

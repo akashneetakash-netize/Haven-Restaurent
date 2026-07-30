@@ -333,6 +333,8 @@ interface StoreContextType {
   notifications: NotificationItem[];
   addNotification: (title: string, message: string, type: NotificationItem['type']) => void;
   markNotificationRead: (id: string) => void;
+  // Cart toast (bottom-left "Added to cart" popup)
+  cartToast: { name: string; imageUrl: string } | null;
   // Hard 5-Minute Timer State
   paymentTimerSeconds: number;
   isPaymentTimerActive: boolean;
@@ -359,6 +361,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [cartToast, setCartToast] = useState<{ name: string; imageUrl: string } | null>(null);
   const [inventory, setInventory] = useState<InventoryItem[]>(INITIAL_INVENTORY);
   const [notifications, setNotifications] = useState<NotificationItem[]>([
     {
@@ -487,6 +490,9 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
       return [...prev, { menuItem, quantity, specialNotes }];
     });
+    // Trigger bottom-left toast notification
+    setCartToast({ name: menuItem.name, imageUrl: menuItem.imageUrl });
+    setTimeout(() => setCartToast(null), 2800);
   };
 
   const removeFromCart = (itemId: string) => {
@@ -638,6 +644,7 @@ export const StoreProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         notifications,
         addNotification,
         markNotificationRead,
+        cartToast,
         paymentTimerSeconds,
         isPaymentTimerActive,
         startPaymentTimer,
