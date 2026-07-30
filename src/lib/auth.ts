@@ -82,13 +82,15 @@ export const authOptions: NextAuthOptions = {
     },
 
     async redirect({ url, baseUrl }) {
-      // Dynamically handle Vercel deployment URLs vs local localhost
-      const host = process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : process.env.NEXTAUTH_URL || baseUrl;
+      // Prioritize NEXTAUTH_URL (production domain) over dynamic VERCEL_URL preview subdomains
+      const host = process.env.NEXTAUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : baseUrl);
       
       if (url.startsWith('/')) return `${host}${url}`;
-      if (new URL(url).origin === new URL(host).origin) return url;
+      try {
+        if (new URL(url).origin === new URL(host).origin) return url;
+      } catch (e) {
+        // Fallback if URL parsing fails
+      }
       return host;
     },
   },
